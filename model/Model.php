@@ -44,9 +44,9 @@ class Model {
 
     // We should take care about conditions of getting a proper title. But for now it is ok just to limit.
     $stmt = $this->db->query('SELECT title FROM data LIMIT 1');
-    $title = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($title) {
-      $output = reset($title);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($row['title'])) {
+      $output = $row['title'];
     }
 
     return htmlentities($output);
@@ -62,9 +62,10 @@ class Model {
     $output = FALSE;
 
     $stmt = $this->db->query('SELECT * FROM table1');
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($results as $item) {
-      $output[] = htmlentities($item['name']);
+    while ($item = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      if (!empty($item['name'])) {
+        $output[] = htmlentities($item['name']);
+      }
     }
 
     return $output;
