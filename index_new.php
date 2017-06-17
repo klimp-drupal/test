@@ -6,7 +6,7 @@ if ($db_connection->connect_error) {
 }
 
 function getPageTitle() {
-  $title = 'empty';
+  $title = 'Simple Website';
 
   global $db_connection;
   $result = $db_connection->query('SELECT title FROM data LIMIT 1');

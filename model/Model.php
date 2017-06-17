@@ -40,8 +40,9 @@ class Model {
    *   Page title.
    */
   public function getPageTitle() {
-    $output = 'empty';
+    $output = 'Simple Website';
 
+    // We should take care about conditions of getting a proper title. But for now it is ok just to limit.
     $stmt = $this->db->query('SELECT title FROM data LIMIT 1');
     $title = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($title) {
