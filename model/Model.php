@@ -5,9 +5,9 @@ class Model {
   /**
    * Database connection handler.
    *
-   * @var \mysqli
+   * @var \PDO
    */
-  private $dbConnection;
+  private $db;
 
   /**
    * Model constructor.
@@ -15,11 +15,22 @@ class Model {
    * @throws \Exception
    */
   public function __construct() {
-    $db_connection = new mysqli('localhost', 'root', 'ccqbmbok', 'test');
-    if ($db_connection->connect_error) {
-      throw new \Exception('Error : ('. $db_connection->connect_errno .') '. $db_connection->connect_error);
-    }
-    $this->dbConnection = $db_connection;
+    $db_host = 'localhost';
+    $db_name = 'test';
+    $db_user = 'root';
+    $db_pass = 'ccqbmbok';
+
+    $db_connection = new PDO(
+      'mysql:host=' . $db_host . ';dbname=' . $db_name . ';charset=utf8mb4',
+      $db_user,
+      $db_pass,
+      [
+        PDO::ATTR_EMULATE_PREPARES => FALSE,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      ]
+    );
+
+    $this->db = $db_connection;
   }
 
   /**
@@ -31,13 +42,10 @@ class Model {
   public function getPageTitle() {
     $output = 'empty';
 
-    $result = $this->dbConnection->query('SELECT title FROM data LIMIT 1');
-    if ($result) {
-      $result->data_seek(0);
-      $row = $result->fetch_row();
-      if (!empty($row)) {
-        $output = reset($row);
-      }
+    $stmt = $this->db->query('SELECT title FROM data LIMIT 1');
+    $title = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($title) {
+      $output = reset($title);
     }
 
     return htmlentities($output);
@@ -51,14 +59,11 @@ class Model {
    */
   public function getPageContent() {
     $output = FALSE;
-    $result = $this->dbConnection->query('SELECT * FROM table1');
-    if ($result) {
-      $result->data_seek(0);
-      while($row = $result->fetch_assoc()) {
-        if (!empty($row['name'])) {
-          $output[] = htmlentities($row['name']);
-        }
-      }
+
+    $stmt = $this->db->query('SELECT * FROM table1');
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($results as $item) {
+      $output[] = htmlentities($item['name']);
     }
 
     return $output;
